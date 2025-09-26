@@ -1,0 +1,18 @@
+<configuration>
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>cl1bsbs79t8f6bsbhfa8-ucir</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.address</name>
+        <value>cl1bsbs79t8f6bsbhfa8-ucir:8032</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.scheduler.address</name>
+        <value>cl1bsbs79t8f6bsbhfa8-ucir:8030</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.resource-tracker.address</name>
+        <value>cl1bsbs79t8f6bsbhfa8-ucir:8031</value>
+    </property>
+</configuration>

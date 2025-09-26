@@ -1,0 +1,52 @@
+---
+
+- name: "Configure and start master"
+  hosts: master
+  become: yes
+  tasks:
+    - name: Create spark-env.sh for master
+      copy:
+        content: |
+          SPARK_MASTER_HOST={{ ansible_host }}
+          SPARK_MASTER_PORT=7077
+          SPARK_MASTER_WEBUI_PORT=8080
+        dest: /opt/spark/conf/spark-env.sh
+
+    - name: Start master
+      command: /opt/spark/sbin/start-master.sh
+      async: 45
+      poll: 0
+
+- name: "Configure and start workers"
+  hosts: workers
+  become: yes
+  tasks:
+    - name: Create spark-env.sh for workers
+      copy:
+        content: |
+          SPARK_WORKER_CORES={{ ansible_processor_vcpus }}
+          SPARK_WORKER_MEMORY={{ (ansible_memory_mb['real']['total'] * 0.8) | int }}m
+          SPARK_MASTER=spark://{{ groups['master'][0] }}:7077
+        dest: /opt/spark/conf/spark-env.sh
+
+    - name: Start workers
+      command: /opt/spark/sbin/start-worker.sh spark://{{ groups['master'][0] }}:7077
+      async: 45
+      poll: 0
+
+- name: "Verify cluster status"
+  hosts: master
+  tasks:
+    - name: Check if master is running
+      command: jps
+      register: jps_result
+
+    - name: Show jps output
+      debug:
+        var: jps_result.stdout
+
+    - name: Display cluster info
+      debug:
+        msg: |
+          Spark Master UI: http://{{ ansible_host }}:8080
+          Connect with: spark://{{ ansible_host }}:7077
